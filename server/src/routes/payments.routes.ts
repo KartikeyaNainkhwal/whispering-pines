@@ -1,15 +1,15 @@
-import { Router } from 'express';
+import { Router, raw } from 'express';
 import { validate } from '../middleware/validate';
 import { paymentLimiter } from '../middleware/rateLimiter';
 import { createPaymentIntentSchema } from '../schemas/booking.schema';
-import { createRazorpayOrder, verifyPayment } from '../controllers/payments.controller';
+import { createCheckoutSession, webhook } from '../controllers/payments.controller';
 
 const router = Router();
 
-// Create Razorpay order (called before checkout)
-router.post('/create-order', paymentLimiter, validate(createPaymentIntentSchema), createRazorpayOrder);
+// Create Stripe Checkout Session
+router.post('/create-checkout-session', paymentLimiter, validate(createPaymentIntentSchema), createCheckoutSession);
 
-// Verify payment after Razorpay callback
-router.post('/verify', paymentLimiter, verifyPayment);
+// Stripe Webhook (needs raw body)
+router.post('/webhook', raw({ type: 'application/json' }), webhook);
 
 export default router;

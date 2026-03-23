@@ -1,13 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../db/prisma';
 import { checkAvailability, calculateNights } from '../services/availability.service';
-import { createOrder, verifyPaymentSignature } from '../services/razorpay.service';
 import { sendBookingConfirmation, sendBookingNotification } from '../services/email.service';
 import { env } from '../config/env';
+import Stripe from 'stripe';
 
-// POST /api/payments/create-order
-// Called when user submits guest details — creates a Razorpay order
-export async function createRazorpayOrder(
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-04-10' as any, // use current stable or any, avoids node-ssdk type mismatch
+});
+
+// POST /api/payments/create-checkout-session
+// Called when user submits guest details — creates a Stripe Checkout Session
+export async function createCheckoutSession(
   req: Request,
   res: Response,
   next: NextFunction
@@ -43,7 +47,7 @@ export async function createRazorpayOrder(
       return;
     }
 
-    // Re-validate availability server-side (never trust client)
+    // Re-validate availability server-side
     const totalGuests = guests.adults + guests.children;
     const available = await checkAvailability(checkInDate, checkOutDate, totalGuests);
     const isAvailable = available.some((a) => a.id === accommodationId);
@@ -53,7 +57,6 @@ export async function createRazorpayOrder(
       return;
     }
 
-    // Authoritative pricing from DB
     const accommodation = await prisma.accommodation.findUnique({ where: { id: accommodationId } });
     if (!accommodation) {
       res.status(404).json({ error: 'Accommodation not found' });
@@ -75,10 +78,7 @@ export async function createRazorpayOrder(
     }
 
     const totalAmount = roomSubtotal + enhancementsSubtotal;
-    // Razorpay amounts are in paise (smallest currency unit)
-    // For INR: 1 INR = 100 paise
-    // For USD: if you use USD, 1 USD = 100 cents — same logic
-    const totalAmountPaise = Math.round(totalAmount * 100);
+    const totalAmountCents = Math.round(totalAmount * 100);
 
     // Create booking in DB with status 'pending'
     const booking = await prisma.booking.create({
@@ -95,7 +95,7 @@ export async function createRazorpayOrder(
         accommodationId,
         roomSubtotal,
         enhancementsSubtotal,
-        totalAmountCents: totalAmountPaise,
+        totalAmountCents,
         status: 'pending',
         enhancements: {
           create: services.map((s) => ({
@@ -106,90 +106,113 @@ export async function createRazorpayOrder(
       },
     });
 
-    // Create Razorpay order
-    const order = await createOrder(totalAmountPaise, booking.id);
+    // Create line items for Stripe Checkout
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `${accommodation.name} (${nights} Nights)`,
+            description: `${checkInDate.toLocaleDateString()} to ${checkOutDate.toLocaleDateString()}`,
+          },
+          unit_amount: Math.round(roomSubtotal * 100),
+        },
+        quantity: 1,
+      },
+    ];
 
-    // Store Razorpay order ID on booking
+    if (enhancementsSubtotal > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Selected Enhancements',
+            description: services.map((s) => s.name).join(', '),
+          },
+          unit_amount: Math.round(enhancementsSubtotal * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      customer_email: guestEmail,
+      client_reference_id: booking.id,
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `${env.FRONTEND_URL}/booking/confirmed?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.FRONTEND_URL}/booking?canceled=true`,
+      metadata: {
+        bookingId: booking.id,
+      },
+    });
+
+    // Store the stripe session ID so we can verify later
     await prisma.booking.update({
       where: { id: booking.id },
-      data: { stripePaymentIntentId: order.id }, // reusing this field for Razorpay order ID
+      data: { stripePaymentIntentId: session.id },
     });
 
     res.json({
-      orderId: order.id,
-      bookingId: booking.id,
-      amount: totalAmountPaise,
-      currency: env.RAZORPAY_CURRENCY,
-      keyId: env.RAZORPAY_KEY_ID,
+      url: session.url,
       breakdown: {
         roomSubtotal,
         enhancementsSubtotal,
         total: totalAmount,
         nights,
       },
-      prefill: {
-        name: `${guestFirstName} ${guestLastName}`,
-        email: guestEmail,
-      },
     });
   } catch (err) {
     next(err);
   }
 }
 
-// POST /api/payments/verify
-// Called by frontend after Razorpay payment succeeds — verifies signature and confirms booking
-export async function verifyPayment(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
+// POST /api/payments/webhook
+// Called by Stripe exactly once when payment succeeds
+export async function webhook(req: Request, res: Response): Promise<void> {
+  const sig = req.headers['stripe-signature'];
+  let event: Stripe.Event;
+
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, bookingId } = req.body as {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
-      bookingId: string;
-    };
-
-    // Verify HMAC signature
-    const isValid = verifyPaymentSignature(
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
-    );
-
-    if (!isValid) {
-      res.status(400).json({ error: 'Payment verification failed. Please contact support.' });
-      return;
-    }
-
-    // Confirm booking in DB
-    const booking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: {
-        status: 'confirmed',
-        paidAt: new Date(),
-        stripeChargeId: razorpay_payment_id, // reusing field for Razorpay payment ID
-      },
-      include: {
-        accommodation: true,
-        enhancements: { include: { service: true } },
-      },
-    });
-
-    // Send confirmation emails (non-blocking)
-    void sendBookingConfirmation(booking);
-    void sendBookingNotification(booking);
-
-    res.json({ success: true, bookingId: booking.id });
+    if (!sig) throw new Error('No signature provided');
+    // Important: req.body must be raw buffer for signature verification
+    event = stripe.webhooks.constructEvent(req.body, sig, env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    next(err);
+    console.error('Webhook signature verification failed.', err);
+    res.status(400).send(`Webhook Error: ${(err as Error).message}`);
+    return;
   }
-}
 
-// Keep this empty export so the app.ts import doesn't break
-// (we removed the Stripe webhook — Razorpay doesn't need a webhook for basic flow)
-export function webhook(_req: Request, res: Response): void {
+  // Handle successful checkout
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const bookingId = session.metadata?.bookingId;
+
+    if (bookingId) {
+      try {
+        const booking = await prisma.booking.update({
+          where: { id: bookingId },
+          data: {
+            status: 'confirmed',
+            paidAt: new Date(),
+            stripeChargeId: session.payment_intent as string,
+          },
+          include: {
+            accommodation: true,
+            enhancements: { include: { service: true } },
+          },
+        });
+
+        // Send confirmation emails (non-blocking)
+        void sendBookingConfirmation(booking);
+        void sendBookingNotification(booking);
+      } catch (e) {
+        console.error('Error updating booking status after checkout:', e);
+      }
+    }
+  }
+
   res.json({ received: true });
 }

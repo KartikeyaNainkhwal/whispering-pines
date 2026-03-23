@@ -23,8 +23,14 @@ export function createApp() {
   // 3. Global rate limiter
   app.use(globalLimiter);
 
-  // 4. JSON body parser
-  app.use(express.json({ limit: '10kb' }));
+  // 4. JSON body parser (skip for Stripe Webhook)
+  app.use((req, res, next) => {
+    if (req.originalUrl === '/api/payments/webhook') {
+      next();
+    } else {
+      express.json({ limit: '10kb' })(req, res, next);
+    }
+  });
   app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
   // 5. API routes

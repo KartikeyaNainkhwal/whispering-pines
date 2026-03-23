@@ -12,10 +12,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(16),
   JWT_EXPIRES_IN: z.string().default('24h'),
 
-  // Razorpay
-  RAZORPAY_KEY_ID: z.string().default('rzp_test_placeholder'),
-  RAZORPAY_KEY_SECRET: z.string().default('placeholder_secret'),
-  RAZORPAY_CURRENCY: z.string().default('INR'),
+  // Stripe
+  STRIPE_SECRET_KEY: z.string().default('sk_test_placeholder'),
+  STRIPE_WEBHOOK_SECRET: z.string().default('whsec_placeholder'),
 
   // Email
   SMTP_HOST: z.string().default('smtp.gmail.com'),
