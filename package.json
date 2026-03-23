@@ -1,0 +1,13 @@
+{
+    "name": "whispering-pines-deploy",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "prebuild": "cd server && npm ci",
+        "build": "cd server && npx prisma generate && npm run build",
+        "start": "cd server && npm start"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
