@@ -22,7 +22,7 @@ export const termsOfService: string[] = [
   '### 10. Modifications',
   'Whispering Pines Retreats reserves the right to modify these terms at any time. Changes will be posted on this page with an updated "Last updated" date. Continued use of our services after changes constitutes acceptance of the modified terms.',
   '### 11. Contact',
-  'For questions about these terms, please contact us at info@whisperingpinesretreats.com or call (509) 427-0000.',
+  'For questions about these terms, please contact us at info@whisperingpinesretreats.com or call (360) 427-8866.',
 ];
 
 export const privacyPolicy: string[] = [
@@ -75,5 +75,5 @@ export const cancellationPolicy: string[] = [
   '### Refund Processing',
   'All refunds are processed to the original payment method via Stripe. Please allow 5–7 business days for the refund to appear on your statement. If you have not received your refund within 10 business days, please contact us.',
   '### Contact',
-  'For cancellation requests or questions about this policy, email bookings@whisperingpinesretreats.com or call (509) 427-0000.',
+  'For cancellation requests or questions about this policy, email bookings@whisperingpinesretreats.com or call (360) 427-8866.',
 ];

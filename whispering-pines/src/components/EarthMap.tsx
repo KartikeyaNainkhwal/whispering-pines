@@ -21,14 +21,14 @@ const EarthMap = () => {
                                 <MapPin size={24} strokeWidth={1.5} className="detail-icon" />
                                 <div>
                                     <h3>Address</h3>
-                                    <p>1101 Bear Creek Rd<br />Carson, WA 98610</p>
+                                    <p>264 Wind River Rd<br />Stevenson, WA 98648</p>
                                 </div>
                             </div>
                             <div className="map-detail-item">
                                 <Phone size={24} strokeWidth={1.5} className="detail-icon" />
                                 <div>
                                     <h3>Telephone</h3>
-                                    <p>(509) 427-0000</p>
+                                    <p>(360) 427-8866</p>
                                 </div>
                             </div>
                             <div className="map-detail-item">
@@ -39,7 +39,7 @@ const EarthMap = () => {
                                 </div>
                             </div>
                         </div>
-                        <a href="https://maps.google.com/maps?q=Columbia%20Gorge%20Getaways,%201101%20Bear%20Creek%20Road,%20Carson,%20WA" target="_blank" rel="noopener noreferrer" className="btn btn-primary map-action-btn">
+                        <a href="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648" target="_blank" rel="noopener noreferrer" className="btn btn-primary map-action-btn">
                             Get Directions
                         </a>
                     </motion.div>
@@ -48,7 +48,7 @@ const EarthMap = () => {
                     <iframe
                         title="Whispering Pines Retreats Location"
                         className="google-map-iframe-split"
-                        src="https://maps.google.com/maps?q=Columbia%20Gorge%20Getaways,%201101%20Bear%20Creek%20Road,%20Carson,%20WA%2098610&t=&z=11&ie=UTF8&iwloc=&output=embed"
+                        src="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648&t=&z=13&ie=UTF8&iwloc=&output=embed"
                         loading="lazy"
                     ></iframe>
                 </div>

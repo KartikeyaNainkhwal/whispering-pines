@@ -8,16 +8,16 @@ const contactDetails = [
   {
     icon: MapPin,
     label: 'Address',
-    value: '1101 Bear Creek Rd',
-    sub: 'Carson, WA 98610',
-    href: 'https://maps.google.com/maps?q=1101+Bear+Creek+Rd,+Carson,+WA+98610',
+    value: '264 Wind River Rd',
+    sub: 'Stevenson, WA 98648',
+    href: 'https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648',
   },
   {
     icon: Phone,
     label: 'Telephone',
-    value: '(509) 427-0000',
+    value: '(360) 427-8866',
     sub: 'Mon – Sun, 8 am – 8 pm PT',
-    href: 'tel:+15094270000',
+    href: 'tel:+13604278866',
   },
   {
     icon: Mail,
@@ -40,7 +40,7 @@ const fadeUp = {
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.65, delay: i * 0.12, ease: 'easeOut' as const },
   }),
 };
 
@@ -248,12 +248,12 @@ const Contact = () => {
             <div className="contact-map-container">
               <iframe
                 title="Whispering Pines Retreats Location"
-                src="https://maps.google.com/maps?q=1101+Bear+Creek+Rd,+Carson,+WA+98610&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                src="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648&t=&z=13&ie=UTF8&iwloc=&output=embed"
                 className="contact-map-iframe"
                 loading="lazy"
               />
               <a
-                href="https://maps.google.com/maps?q=1101+Bear+Creek+Rd,+Carson,+WA+98610"
+                href="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-directions-btn"

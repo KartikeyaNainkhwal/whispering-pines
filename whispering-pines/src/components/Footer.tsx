@@ -97,12 +97,12 @@ const Footer = () => {
                         <ul style={{ marginBottom: '0' }}>
                             <li>
                                 <MapPin size={15} />
-                                <span>1101 Bear Creek Rd<br />Carson, WA 98610</span>
+                                <span>264 Wind River Rd<br />Stevenson, WA 98648</span>
                             </li>
                             <li>
                                 <Phone size={15} />
-                                <a href="tel:+15094270000" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
-                                    (509) 427-0000
+                                <a href="tel:+13604278866" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
+                                    (360) 427-8866
                                 </a>
                             </li>
                             <li>

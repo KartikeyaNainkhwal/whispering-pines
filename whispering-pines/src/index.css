@@ -124,3 +124,111 @@ ul {
   max-width: var(--max-width);
   margin: 0 auto;
 }
+
+/* ════════════════════════════════════════════
+   GLOBAL MOBILE RESPONSIVENESS
+   Perfect experience on every screen size
+   ════════════════════════════════════════════ */
+
+/* ── Prevent horizontal overflow everywhere ── */
+html,
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Touch-friendly tap targets ── */
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+/* ── Fluid images ── */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Section padding: comfortable on mobile ── */
+@media (max-width: 767px) {
+  .section {
+    padding: 3.5rem 1.25rem;
+  }
+
+  /* Scale down all heading sizes on very small screens */
+  h1 {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+  }
+
+  h2 {
+    font-size: clamp(1.6rem, 6vw, 2.8rem);
+  }
+
+  h3 {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+
+  /* Buttons: full width on mobile */
+  .btn {
+    width: 100%;
+    text-align: center;
+    padding: 0.85rem 1.5rem;
+  }
+
+  /* Container: tighter padding on phones */
+  .container {
+    padding: 0 1.25rem;
+  }
+}
+
+/* ── Tablets: 768px – 1023px ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .section {
+    padding: 4.5rem 2rem;
+  }
+
+  .btn {
+    width: auto;
+  }
+}
+
+/* ── Fluid section title helper ── */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+/* ── Fluid subheading helper ── */
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  color: var(--color-gray);
+  line-height: 1.7;
+  font-weight: 400;
+  max-width: 600px;
+}
+
+/* ── Auto-responsive 2-col grids ── */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 2rem;
+}
+
+/* ── Page-section padding (used in many pages) ── */
+.page-section {
+  padding-top: 80px;
+}
+
+@media (max-width: 767px) {
+  .page-section .container {
+    padding-top: 1.5rem;
+  }
+}
