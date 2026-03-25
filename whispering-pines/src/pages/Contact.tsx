@@ -248,12 +248,12 @@ const Contact = () => {
             <div className="contact-map-container">
               <iframe
                 title="Whispering Pines Retreats Location"
-                src="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                src="https://maps.google.com/maps?q=45.6973,-121.9088&z=14&t=&ie=UTF8&iwloc=&output=embed"
                 className="contact-map-iframe"
                 loading="lazy"
               />
               <a
-                href="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648"
+                href="https://www.google.com/maps/dir/?api=1&destination=264+Wind+River+Rd,+Stevenson,+WA+98648"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-directions-btn"

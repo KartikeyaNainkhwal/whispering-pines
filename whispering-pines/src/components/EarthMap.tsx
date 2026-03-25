@@ -39,7 +39,7 @@ const EarthMap = () => {
                                 </div>
                             </div>
                         </div>
-                        <a href="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648" target="_blank" rel="noopener noreferrer" className="btn btn-primary map-action-btn">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=264+Wind+River+Rd,+Stevenson,+WA+98648" target="_blank" rel="noopener noreferrer" className="btn btn-primary map-action-btn">
                             Get Directions
                         </a>
                     </motion.div>
@@ -48,7 +48,7 @@ const EarthMap = () => {
                     <iframe
                         title="Whispering Pines Retreats Location"
                         className="google-map-iframe-split"
-                        src="https://maps.google.com/maps?q=264+Wind+River+Rd,+Stevenson,+WA+98648&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                        src="https://maps.google.com/maps?q=45.6973,-121.9088&z=14&t=&ie=UTF8&iwloc=&output=embed"
                         loading="lazy"
                     ></iframe>
                 </div>
