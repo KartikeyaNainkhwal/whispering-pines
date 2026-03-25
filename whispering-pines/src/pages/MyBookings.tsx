@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Users, Clock, Search, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
+import './MyBookings.css';
 
 const FADE_UP = {
   hidden: { opacity: 0, y: 30 },
@@ -250,91 +251,81 @@ function BookingCard({ booking: b, index, isPast }: { booking: BookingResult; in
 
   return (
     <motion.div variants={FADE_UP} initial="hidden" animate="visible" custom={index}
-      style={{
-        display: 'grid', gridTemplateColumns: '180px 1fr',
-        border: '1px solid rgba(44,66,51,0.1)', overflow: 'hidden',
-        opacity: isPast ? 0.75 : 1,
-      }}>
-      <Link to={`/accommodations/${b.accommodation.slug}`}
-        style={{ display: 'block', overflow: 'hidden', position: 'relative' }}>
+      className="booking-card"
+      style={{ opacity: isPast ? 0.75 : 1 }}>
+      <div className="booking-card-image">
         <img
           src={b.accommodation.images[0]}
           alt={b.accommodation.name}
-          style={{ width: '100%', height: '100%', minHeight: 200, objectFit: 'cover' }}
         />
-        <span style={{
-          position: 'absolute', top: 12, left: 12,
-          padding: '3px 10px', fontSize: '0.65rem', textTransform: 'uppercase',
-          fontFamily: 'var(--font-body)', letterSpacing: '0.08em', fontWeight: 600,
-          background: statusStyle.bg, color: statusStyle.color,
-          backdropFilter: 'blur(4px)',
-        }}>
+        <span className="booking-card-status" style={{ background: statusStyle.bg, color: statusStyle.color }}>
           {statusStyle.label}
         </span>
-      </Link>
+      </div>
 
-      <div style={{ padding: '1.5rem 1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+      <div className="booking-card-content">
+        <div className="booking-card-header">
           <div>
             <h3 style={{
-              fontFamily: 'var(--font-heading)', fontWeight: 400, fontSize: '1.25rem',
-              color: 'var(--color-primary)', marginBottom: '0.15rem',
+              fontFamily: 'var(--font-heading)', fontWeight: 400, fontSize: '1.4rem',
+              color: 'var(--color-primary)', marginBottom: '0.2rem', textTransform: 'none'
             }}>
               {b.accommodation.name}
             </h3>
             <span style={{
               fontFamily: 'var(--font-body)', fontSize: '0.7rem', textTransform: 'uppercase',
-              letterSpacing: '0.1em', color: 'var(--color-secondary)',
+              letterSpacing: '0.15em', color: 'var(--color-secondary)',
             }}>
               {b.accommodation.type.replace('-', ' ')}
             </span>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--color-primary)' }}>
+          <div className="booking-price-badge">
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: 'var(--color-primary)' }}>
               ${(b.totalAmountCents / 100).toLocaleString('en-US')}
             </span>
           </div>
         </div>
 
         <div style={{
-          display: 'flex', gap: '1.25rem', flexWrap: 'wrap', margin: '0.75rem 0',
-          fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: 'var(--color-gray)',
+          display: 'flex', gap: '1.5rem', flexWrap: 'wrap', margin: '0.5rem 0 1rem',
+          fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'var(--color-gray)',
         }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Calendar size={13} /> {formatShortDate(b.checkIn)} → {formatShortDate(b.checkOut)}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Calendar size={14} /> {formatShortDate(b.checkIn)} → {formatShortDate(b.checkOut)}
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Clock size={13} /> {b.nights} night{b.nights !== 1 ? 's' : ''}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Clock size={14} /> {b.nights} night{b.nights !== 1 ? 's' : ''}
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Users size={13} /> {b.guestAdults + b.guestChildren} guest{(b.guestAdults + b.guestChildren) !== 1 ? 's' : ''}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Users size={14} /> {b.guestAdults + b.guestChildren} guest{(b.guestAdults + b.guestChildren) !== 1 ? 's' : ''}
           </span>
         </div>
 
         {b.enhancements.length > 0 && (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.75rem', color: 'var(--color-gray)', marginBottom: '0.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: 'var(--color-gray)', marginBottom: '0.75rem' }}>
             <strong style={{ color: 'var(--color-primary)' }}>Add-ons:</strong> {b.enhancements.map((e) => e.service.name).join(' · ')}
           </p>
         )}
 
         {b.specialRequests && (
           <p style={{
-            padding: '0.6rem 0.75rem', background: 'rgba(44,66,51,0.04)',
+            padding: '0.75rem 1rem', background: 'rgba(44,66,51,0.03)', borderLeft: '2px solid rgba(44,66,51,0.2)',
             fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: 'var(--color-gray)',
             fontStyle: 'italic', marginTop: '0.5rem',
           }}>
-            <MapPin size={11} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
+            <MapPin size={12} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle', marginTop: '-2px' }} />
             {b.specialRequests}
           </p>
         )}
 
-        <div style={{ marginTop: '0.75rem' }}>
+        <div style={{ marginTop: 'auto', paddingTop: '1.5rem' }}>
           <Link to={`/accommodations/${b.accommodation.slug}`}
             style={{
               fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: 'var(--color-secondary)',
-              textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
+              textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6,
+              textTransform: 'uppercase', letterSpacing: '0.05em'
             }}>
-            View accommodation <ArrowRight size={13} />
+            View Details <ArrowRight size={14} />
           </Link>
         </div>
       </div>
