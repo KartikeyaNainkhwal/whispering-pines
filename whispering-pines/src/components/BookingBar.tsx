@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Users, ChevronDown } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './BookingBar.css';
@@ -13,15 +13,10 @@ const BookingBar = () => {
     const [guests, setGuests] = useState({ adults: 2, children: 0 });
     const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation();
 
     const handleBookNow = () => {
         setIsExpanded(false);
-        let preSelectedSlug = undefined;
-        if (location.pathname.startsWith('/accommodations/')) {
-            preSelectedSlug = location.pathname.split('/').pop();
-        }
-        navigate('/book', { state: { dateRange, guests, preSelectedSlug } });
+        navigate('/book', { state: { dateRange, guests } });
     };
 
     return (

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
@@ -48,12 +48,12 @@ const Booking = () => {
     dateRange: [Date | null, Date | null];
     guests: { adults: number; children: number };
     preSelectedRoom?: string;
-    preSelectedSlug?: string;
   } | null;
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [unavailableNotice, setUnavailableNotice] = useState<string | null>(null);
 
   // Dates & guests
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>(
@@ -101,13 +101,14 @@ const Booking = () => {
       .catch(console.error);
   }, []);
 
-  const handleSearch = useCallback(async () => {
+  const handleSearch = async () => {
     if (!startDate || !endDate) {
       setSearchError('Please select check-in and check-out dates.');
       return;
     }
     setIsSearching(true);
     setSearchError(null);
+    setUnavailableNotice(null);
     try {
       const data = await api.post<{ accommodations: Accommodation[]; nights: number }>(
         '/bookings/check-availability',
@@ -115,39 +116,28 @@ const Booking = () => {
       );
       setAvailableRooms(data.accommodations);
       setNights(data.nights);
+
+      // If a room was pre-selected (e.g. from accommodation detail page),
+      // check if it's still available for the chosen dates.
+      if (initialState?.preSelectedRoom) {
+        const match = data.accommodations.find((r) => r.id === initialState.preSelectedRoom);
+        if (match) {
+          // Room is available — select it and jump straight to Enhancements (step 3)
+          setSelectedRoomId(match.id);
+          setStep(3);
+          return;
+        }
+        // Room is NOT available for those dates — show the suite list with a notice
+        setUnavailableNotice('Your selected suite isn\'t available for those dates. Please choose from the options below.');
+      }
+
       setStep(2);
     } catch (err) {
       setSearchError((err as Error).message ?? 'Could not check availability. Please try again.');
     } finally {
       setIsSearching(false);
     }
-  }, [startDate, endDate, guests]);
-
-  // Auto-search if dateRange was provided via location.state
-  const hasAutoSearched = useRef(false);
-  useEffect(() => {
-    if (!hasAutoSearched.current && initialState?.dateRange && startDate && endDate) {
-      hasAutoSearched.current = true;
-      handleSearch();
-    }
-  }, [handleSearch, initialState?.dateRange, startDate, endDate]);
-
-  // Auto-select room when navigating from accommodation detail page
-  useEffect(() => {
-    if (availableRooms.length > 0) {
-      let match = undefined;
-      if (initialState?.preSelectedRoom) {
-        match = availableRooms.find((r) => r.id === initialState.preSelectedRoom);
-      } else if (initialState?.preSelectedSlug) {
-        match = availableRooms.find((r) => r.slug === initialState.preSelectedSlug);
-      }
-
-      if (match) {
-        setSelectedRoomId(match.id);
-        setStep(3);
-      }
-    }
-  }, [availableRooms, initialState?.preSelectedRoom, initialState?.preSelectedSlug]);
+  };
 
   const toggleAddOn = (id: string) => {
     setSelectedAddOnIds((prev) =>
@@ -276,6 +266,11 @@ const Booking = () => {
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="engine-step engine-step-2">
               <h1 className="engine-title">Available Sanctuaries</h1>
+              {unavailableNotice && (
+                <p style={{ color: '#c0392b', marginBottom: '1.5rem', fontFamily: 'var(--font-body)', fontSize: '0.9rem', padding: '12px 16px', background: 'rgba(192,57,43,0.06)', border: '1px solid rgba(192,57,43,0.2)' }}>
+                  ⚠️ {unavailableNotice}
+                </p>
+              )}
               {availableRooms.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '4rem 0' }}>
                   <p style={{ opacity: 0.6, fontFamily: 'var(--font-heading)', fontSize: '1.4rem' }}>No availability for those dates.</p>
