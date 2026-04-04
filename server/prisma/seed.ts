@@ -23,6 +23,12 @@ async function main() {
   console.log(`✓ Admin: ${adminEmail}`);
 
   // ── Accommodations ─────────────────────────────────────
+  const accommodationCount = await prisma.accommodation.count();
+  if (accommodationCount > 0) {
+    console.log('🌲 Database is already seeded. Skipping seed process.');
+    return;
+  }
+
   const accommodations = [
     // Luxury Yurts
     {
