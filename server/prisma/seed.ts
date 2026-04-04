@@ -1,20 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌲 Checking database state...');
-  const accommodationCount = await prisma.accommodation.count();
-  if (accommodationCount > 0) {
-    console.log('🌲 Database already has accommodations. Skipping mock seed to prevent data loss.');
-    return;
-  }
-
   console.log('🌲 Seeding Columbia Gorge Getaways database...\n');
 
   // ── Admin ──────────────────────────────────────────────
@@ -30,6 +23,12 @@ async function main() {
   console.log(`✓ Admin: ${adminEmail}`);
 
   // ── Accommodations ─────────────────────────────────────
+  const accommodationCount = await prisma.accommodation.count();
+  if (accommodationCount > 0) {
+    console.log('🌲 Database is already seeded. Skipping seed process.');
+    return;
+  }
+
   const accommodations = [
     // Luxury Yurts
     {

@@ -9,6 +9,9 @@ import apiRouter from './routes/index';
 export function createApp() {
   const app = express();
 
+  // Trust reverse proxy (Railway, Vercel, etc)
+  app.set('trust proxy', 1);
+
   // 1. Security headers
   app.use(helmet());
 
