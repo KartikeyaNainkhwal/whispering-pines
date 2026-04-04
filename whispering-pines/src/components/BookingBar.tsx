@@ -81,7 +81,11 @@ const BookingBar = () => {
 
                             <div className="booking-divider"></div>
 
-                            <div className="booking-field booking-guest-field">
+                            <div
+                                className="booking-field booking-guest-field"
+                                onMouseEnter={() => setIsGuestDropdownOpen(true)}
+                                onMouseLeave={() => setIsGuestDropdownOpen(false)}
+                            >
                                 <div className="field-label">Guests</div>
                                 <div className="field-value" onClick={() => setIsGuestDropdownOpen(!isGuestDropdownOpen)}>
                                     <Users size={18} />

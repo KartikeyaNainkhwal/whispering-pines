@@ -236,7 +236,11 @@ const Booking = () => {
                   </div>
                 </div>
                 <div className="search-divider" />
-                <div className="search-field guest-field">
+                <div
+                  className="search-field guest-field"
+                  onMouseEnter={() => setIsGuestDropdownOpen(true)}
+                  onMouseLeave={() => setIsGuestDropdownOpen(false)}
+                >
                   <label>Guests</label>
                   <div className="search-input-wrapper" onClick={() => setIsGuestDropdownOpen(!isGuestDropdownOpen)}>
                     <Users size={18} />
