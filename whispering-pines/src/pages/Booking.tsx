@@ -247,17 +247,17 @@ const Booking = () => {
                       <div className="guest-row">
                         <span>Adults</span>
                         <div className="guest-controls">
-                          <button onClick={(e) => { e.stopPropagation(); setGuests({ ...guests, adults: Math.max(1, guests.adults - 1) }); }}>-</button>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setGuests({ ...guests, adults: Math.max(1, guests.adults - 1) }); }}>-</button>
                           <span>{guests.adults}</span>
-                          <button onClick={(e) => { e.stopPropagation(); setGuests({ ...guests, adults: guests.adults + 1 }); }}>+</button>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setGuests({ ...guests, adults: guests.adults + 1 }); }}>+</button>
                         </div>
                       </div>
                       <div className="guest-row">
                         <span>Children</span>
                         <div className="guest-controls">
-                          <button onClick={(e) => { e.stopPropagation(); setGuests({ ...guests, children: Math.max(0, guests.children - 1) }); }}>-</button>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setGuests({ ...guests, children: Math.max(0, guests.children - 1) }); }}>-</button>
                           <span>{guests.children}</span>
-                          <button onClick={(e) => { e.stopPropagation(); setGuests({ ...guests, children: guests.children + 1 }); }}>+</button>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setGuests({ ...guests, children: guests.children + 1 }); }}>+</button>
                         </div>
                       </div>
                     </div>
